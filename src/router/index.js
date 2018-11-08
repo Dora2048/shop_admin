@@ -27,11 +27,12 @@ router.beforeEach(
   (to, form, next) => {
     // console.log(to, form, next)
     const token = localStorage.getItem('token')
-    // 如果有token，或者跳转到登录页，不加登录页判断可能进入死循环
+    // 如果有token
     if (token || to.path === '/login') {
       next()
     } else {
       this.$router.push('/login')
+      // next('/login')
     }
   }
 )

@@ -6,7 +6,7 @@
       <el-input v-model="form.username"></el-input>
     </el-form-item>
     <el-form-item label="密码" prop='password'>
-      <el-input v-model="form.password" type='password'></el-input>
+      <el-input v-model="form.password" type='password' @keyup.enter="login"></el-input>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="login">确认</el-button>
@@ -46,7 +46,7 @@ export default {
           this.$axios
             .post('http://localhost:8888/api/private/v1/login', this.form)
             .then(res => {
-              console.log(res.data)
+              // console.log(res.data)
               if (res.data.meta.status === 200) {
                 // 登陆成功消息提示框
                 this.$message({

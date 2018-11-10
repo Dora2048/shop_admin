@@ -2,13 +2,14 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/components/Login.vue'
 import Home from '@/components/Home.vue'
+import User from '@/components/User.vue'
 
 Vue.use(Router)
 
 const router = new Router({
   routes: [{
       path: '/',
-      component: Login
+      redirect: '/login'
     },
     {
       path: '/login',
@@ -16,8 +17,13 @@ const router = new Router({
     },
     {
       path: '/home',
-      component: Home
+      component: Home,
+      children: [{
+        path: '/users',
+        component: User
+      }]
     }
+
   ]
 })
 
@@ -31,8 +37,8 @@ router.beforeEach(
     if (token || to.path === '/login') {
       next()
     } else {
-      this.$router.push('/login')
-      // next('/login')
+      // this.$router.push('/login')
+      next('/login')
     }
   }
 )

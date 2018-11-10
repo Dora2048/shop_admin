@@ -18,19 +18,21 @@
         <el-row class="tac">
           <el-col :span="12">
             <el-menu
-              default-active="2"
+              default-active="/users"
               class="el-menu-vertical-demo"
               @open="handleOpen"
               @close="handleClose"
               background-color="#545c64"
               text-color="#fff"
-              active-text-color="#ffd04b">
+              active-text-color="#ffd04b"
+              router
+              unique-opened>
               <el-submenu index="1">
                 <template slot="title">
                   <i class="el-icon-location"></i>
                   <span>用户管理</span>
                 </template>
-                <el-menu-item index="1-1">
+                <el-menu-item index="/users">
                   <i class="el-icon-menu"></i>
                   <span>用户列表</span>
                 </el-menu-item>
@@ -96,7 +98,9 @@
         </el-row>
       </el-aside>
       <!-- main -->
-      <el-main class="main">Main</el-main>
+      <el-main class="main">
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -106,6 +110,16 @@ export default {
   methods: {
     handleOpen(key, keyPath) {
       console.log(key, keyPath)
+      // this.$axios({
+      //   methods: 'get',
+      //   url: 'http://localhost:8888/api/private/v1/users',
+      //   data: {
+      //     pagenum: 1,
+      //     pagesize: 2
+      //   }
+      // }).then(res => {
+      //   console.log(res)
+      // })
     },
     handleClose(key, keyPath) {
       console.log(key, keyPath)
@@ -126,13 +140,15 @@ export default {
 
           this.$message({
             type: 'success',
-            message: '退出成功!'
+            message: '退出成功!',
+            center: true
           })
         })
         .catch(() => {
           this.$message({
             type: 'info',
-            message: '已取消退出'
+            message: '已取消退出',
+            center: true
           })
         })
     }
@@ -186,6 +202,7 @@ export default {
     }
     .main {
       background-color: #eaeef1;
+      padding: 20px;
     }
   }
 }

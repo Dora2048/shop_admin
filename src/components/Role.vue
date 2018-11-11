@@ -75,7 +75,7 @@ export default {
       url: 'roles'
     }).then(res => {
       console.log(res)
-      this.tableData = res.data.data
+      this.tableData = res.data
     })
   }
 }

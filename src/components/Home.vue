@@ -110,16 +110,6 @@ export default {
   methods: {
     handleOpen(key, keyPath) {
       console.log(key, keyPath)
-      // this.$axios({
-      //   methods: 'get',
-      //   url: 'http://localhost:8888/api/private/v1/users',
-      //   data: {
-      //     pagenum: 1,
-      //     pagesize: 2
-      //   }
-      // }).then(res => {
-      //   console.log(res)
-      // })
     },
     handleClose(key, keyPath) {
       console.log(key, keyPath)

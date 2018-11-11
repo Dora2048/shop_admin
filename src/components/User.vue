@@ -59,9 +59,9 @@
 
     <el-table-column label="操作">
       <template slot-scope="scope">
-        <el-button type="primary" icon="el-icon-edit" plain></el-button>
-        <el-button type="danger" icon="el-icon-delete" plain @click='del(scope.row.id)'></el-button>
-        <el-button type="success" icon="el-icon-check" plain>分配角色</el-button>
+        <el-button size='small' type="primary" icon="el-icon-edit" plain></el-button>
+        <el-button size='small' type="danger" icon="el-icon-delete" plain @click='del(scope.row.id)'></el-button>
+        <el-button size='small' type="success" icon="el-icon-check" plain>分配角色</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -99,16 +99,13 @@ export default {
   methods: {
     // 获取用户列表
     getUserList() {
-      this.$axios({
+      this.axios({
         method: 'get',
-        url: 'http://localhost:8888/api/private/v1/users',
+        url: 'users',
         params: {
           query: this.query,
           pagenum: this.currentPage,
           pagesize: this.pageSize
-        },
-        headers: {
-          Authorization: localStorage.getItem('token')
         }
       }).then(res => {
         console.log(res)
@@ -152,12 +149,9 @@ export default {
       })
         .then(() => {
           // 发送请求
-          this.$axios({
+          this.axios({
             method: 'delete',
-            url: `http://localhost:8888/api/private/v1/users/${id}`,
-            headers: {
-              Authorization: localStorage.getItem('token')
-            }
+            url: `users/${id}`
           }).then(res => {
             console.log(res)
             if (res.data.meta.status === 200) {

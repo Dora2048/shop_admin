@@ -3,7 +3,6 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import axios from 'axios'
 
 // 引入element-ui组件库
 import ElementUI from 'element-ui'
@@ -11,12 +10,25 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 // 引入公共样式
 import '@/css/common.css'
-
+// 引入axios，并将其添加到vue原型上，方便使用
+import axios from 'axios'
+Vue.prototype.axios = axios
 // 使用ElementUI插件
 Vue.use(ElementUI)
 Vue.config.productionTip = false
+// 将接口基准地址配置为全局默认值
+axios.defaults.baseURL = 'http://localhost:8888/api/private/v1/'
 
-Vue.prototype.$axios = axios
+// 通过axios的拦截器，设置请求头
+axios.interceptors.request.use(function (config) {
+  // 在发送请求之前做些什么
+  // return config;
+  config.headers.Authorization = localStorage.getItem('token')
+  return config;
+}, function (error) {
+  // 对请求错误做些什么
+  return Promise.reject(error);
+});
 
 /* eslint-disable no-new */
 new Vue({

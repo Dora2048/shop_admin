@@ -6,7 +6,7 @@
       <el-input v-model="form.username"></el-input>
     </el-form-item>
     <el-form-item label="密码" prop='password'>
-      <el-input v-model="form.password" type='password' @keyup.enter="login"></el-input>
+      <el-input v-model="form.password" type='password' @keyup.enter.native="login"></el-input>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="login">确认</el-button>
@@ -43,29 +43,27 @@ export default {
     login() {
       this.$refs.form.validate(valid => {
         if (valid) {
-          this.$axios
-            .post('http://localhost:8888/api/private/v1/login', this.form)
-            .then(res => {
-              // console.log(res.data)
-              if (res.data.meta.status === 200) {
-                // 登陆成功消息提示框
-                this.$message({
-                  message: '登录成功',
-                  type: 'success',
-                  center: true
-                })
-                // 存储token
-                localStorage.setItem('token', res.data.data.token)
-                // 登录成功后跳转到home组件
-                this.$router.push('/home')
-              } else {
-                this.$message({
-                  message: res.data.meta.msg,
-                  type: 'error',
-                  center: true
-                })
-              }
-            })
+          this.axios.post('login', this.form).then(res => {
+            // console.log(res.data)
+            if (res.data.meta.status === 200) {
+              // 登陆成功消息提示框
+              this.$message({
+                message: '登录成功',
+                type: 'success',
+                center: true
+              })
+              // 存储token
+              localStorage.setItem('token', res.data.data.token)
+              // 登录成功后跳转到home组件
+              this.$router.push('/home')
+            } else {
+              this.$message({
+                message: res.data.meta.msg,
+                type: 'error',
+                center: true
+              })
+            }
+          })
         } else {
           console.log('校验失败')
           return false

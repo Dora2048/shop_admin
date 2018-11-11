@@ -44,8 +44,8 @@ export default {
       this.$refs.form.validate(valid => {
         if (valid) {
           this.axios.post('login', this.form).then(res => {
-            // console.log(res.data)
-            if (res.data.meta.status === 200) {
+            // console.log(res)
+            if (res.meta.status === 200) {
               // 登陆成功消息提示框
               this.$message({
                 message: '登录成功',
@@ -53,12 +53,12 @@ export default {
                 center: true
               })
               // 存储token
-              localStorage.setItem('token', res.data.data.token)
+              localStorage.setItem('token', res.data.token)
               // 登录成功后跳转到home组件
               this.$router.push('/home')
             } else {
               this.$message({
-                message: res.data.meta.msg,
+                message: res.meta.msg,
                 type: 'error',
                 center: true
               })

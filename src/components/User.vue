@@ -17,7 +17,7 @@
         <el-button slot="append" icon="el-icon-search"  @click='search'></el-button>
       </el-input>
     </el-col>
-    <el-button type="success" plain @click='shwoAddDialog'>添加用户</el-button>
+    <el-button type="success" plain @click='showAddDialog'>添加用户</el-button>
   </el-row>
   
   <!-- 表格 -->
@@ -52,14 +52,15 @@
         <el-switch
           v-model="scope.row.mg_state"
           active-color="#409EFF"
-          inactive-color="#C0CCDA">
+          inactive-color="#C0CCDA"
+          @change='changeStatus(scope.row)'>
         </el-switch>
       </template>
     </el-table-column>
 
     <el-table-column label="操作">
       <template slot-scope="scope">
-        <el-button size='small' type="primary" icon="el-icon-edit" plain></el-button>
+        <el-button size='small' type="primary" icon="el-icon-edit" plain @click='showEditDialog(scope.row)'></el-button>
         <el-button size='small' type="danger" icon="el-icon-delete" plain @click='del(scope.row.id)'></el-button>
         <el-button size='small' type="success" icon="el-icon-check" plain>分配角色</el-button>
       </template>
@@ -103,6 +104,28 @@
     </span>
   </el-dialog>
 
+<!-- 编辑对话框 -->
+  <el-dialog 
+  title="提示"
+  :visible.sync="editDialogVisible"
+  width="50%">
+    <el-form :model='editform' label-width='80px' ref='editform' :rules='rules' status-icon>
+      <el-form-item label='用户名'>
+        <el-tag type="info">{{ editform.username}}</el-tag>
+      </el-form-item>
+      <el-form-item label='邮箱' prop='email'>
+        <el-input v-model='editform.email'></el-input>
+      </el-form-item>
+      <el-form-item label='电话' prop='mobile'>
+        <el-input v-model='editform.mobile'></el-input>
+      </el-form-item>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="editDialogVisible = false">取 消</el-button>
+      <el-button type="primary" @click='editUser(editform.id)'>确 定</el-button>
+    </span>
+  </el-dialog>
+
 </div>
 </template>
 
@@ -142,7 +165,7 @@ export default {
           {
             type: 'email',
             message: '请输入正确的邮箱地址',
-            trigger: ['blur', 'change']
+            trigger: 'blur'
           }
         ],
         mobile: [
@@ -156,7 +179,16 @@ export default {
             trigger: 'blur'
           }
         ]
-      }
+      },
+      // 编辑对话框数据
+      editform: {
+        id: '',
+        email: '',
+        mobile: '',
+        username: ''
+      },
+      // 编辑对话框显示隐藏
+      editDialogVisible: false
     }
   },
   methods: {
@@ -172,13 +204,13 @@ export default {
         }
       }).then(res => {
         // console.log(res)
-        // console.log(res.data.data.users)
-        // console.log(res.data.data.total)
-        if (res.data.meta.status === 200) {
-          this.tableData = res.data.data.users
-          this.total = res.data.data.total
+        // console.log(res.data.users)
+        // console.log(res.data.total)
+        if (res.meta.status === 200) {
+          this.tableData = res.data.users
+          this.total = res.data.total
         } else {
-          this.$message.info(res.data.meta.msg)
+          this.$message.info(res.meta.msg)
         }
       })
     },
@@ -217,14 +249,14 @@ export default {
             url: `users/${id}`
           }).then(res => {
             // console.log(res)
-            if (res.data.meta.status === 200) {
+            if (res.meta.status === 200) {
               // 成功删除后，重新渲染，定位到第一页
               this.currentPage = 1
               this.getUserList()
               // 提示信息
-              this.$message.success(res.data.meta.msg)
+              this.$message.success(res.meta.msg)
             } else {
-              this.$message.error(res.data.meta.msg)
+              this.$message.error(res.meta.msg)
             }
           })
           // this.$message({
@@ -240,7 +272,7 @@ export default {
         })
     },
     // 添加功能
-    shwoAddDialog() {
+    showAddDialog() {
       this.addDialogVisible = true
     },
     addUser() {
@@ -254,8 +286,9 @@ export default {
           data: this.addform
         }).then(res => {
           console.log(res)
-          if (res.data.meta.status === 201) {
+          if (res.meta.status === 201) {
             // 添加成功，重新渲染,要看到添加结果，就要渲染最后一页
+            this.total++
             this.currentPage = Math.ceil(this.total / this.pageSize)
             this.getUserList()
             // 重置表单
@@ -264,6 +297,45 @@ export default {
             this.addDialogVisible = false
           }
         })
+      })
+    },
+    // 编辑功能
+    showEditDialog(user) {
+      this.editDialogVisible = true
+      // 数据回显
+      this.editform.username = user.username
+      this.editform.id = user.id
+      this.editform.email = user.email
+      this.editform.mobile = user.mobile
+    },
+    editUser(id) {
+      // 校验
+      this.$refs.editform.validate(valid => {
+        if (!valid) return this.$message.warning('校验失败')
+        // 校验成功，发送请求
+        this.axios({
+          method: 'put',
+          url: `users/${id}`,
+          data: this.editform
+        }).then(res => {
+          // console.log(res)
+          if (res.meta.status === 200) {
+            // 渲染当前页
+            this.getUserList()
+            // 关闭对话框
+            this.editDialogVisible = false
+          }
+        })
+      })
+    },
+    // 改变用户状态
+    changeStatus(user) {
+      this.axios({
+        method: 'put',
+        url: `users/${user.id}/state/${user.mg_state}`
+      }).then(res => {
+        // console.log(res)
+        this.$message.info(res.meta.msg)
       })
     }
   },

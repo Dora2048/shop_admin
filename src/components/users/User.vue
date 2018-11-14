@@ -206,11 +206,12 @@ export default {
         // console.log(res)
         // console.log(res.data.users)
         // console.log(res.data.total)
-        if (res.meta.status === 200) {
-          this.tableData = res.data.users
-          this.total = res.data.total
+        let { meta: { status, msg }, data: { users, total } } = res
+        if (status === 200) {
+          this.tableData = users
+          this.total = total
         } else {
-          this.$message.info(res.meta.msg)
+          this.$message.info(msg)
         }
       })
     },
@@ -244,25 +245,23 @@ export default {
       })
         .then(() => {
           // 发送请求
-          this.axios({
+          return this.axios({
             method: 'delete',
             url: `users/${id}`
-          }).then(res => {
-            // console.log(res)
-            if (res.meta.status === 200) {
-              // 成功删除后，重新渲染，定位到第一页
-              this.currentPage = 1
-              this.getUserList()
-              // 提示信息
-              this.$message.success(res.meta.msg)
-            } else {
-              this.$message.error(res.meta.msg)
-            }
           })
-          // this.$message({
-          //   type: 'success',
-          //   message: '删除成功!'
-          // })
+        })
+        .then(res => {
+          let { meta: { status, msg } } = res
+          // console.log(res)
+          if (status === 200) {
+            // 成功删除后，重新渲染，定位到第一页
+            this.currentPage = 1
+            this.getUserList()
+            // 提示信息
+            this.$message.success(msg)
+          } else {
+            this.$message.error(msg)
+          }
         })
         .catch(() => {
           this.$message({
@@ -285,8 +284,9 @@ export default {
           url: 'users',
           data: this.addform
         }).then(res => {
-          console.log(res)
-          if (res.meta.status === 201) {
+          // console.log(res)
+          let { meta: { status } } = res
+          if (status === 201) {
             // 添加成功，重新渲染,要看到添加结果，就要渲染最后一页
             this.total++
             this.currentPage = Math.ceil(this.total / this.pageSize)
@@ -319,7 +319,8 @@ export default {
           data: this.editform
         }).then(res => {
           // console.log(res)
-          if (res.meta.status === 200) {
+          let { meta: { status } } = res
+          if (status === 200) {
             // 渲染当前页
             this.getUserList()
             // 关闭对话框

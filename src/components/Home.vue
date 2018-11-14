@@ -18,16 +18,24 @@
         <el-row class="tac">
           <el-col :span="12">
             <el-menu
-              default-active="/users"
-              class="el-menu-vertical-demo"
-              @open="handleOpen"
-              @close="handleClose"
               background-color="#545c64"
               text-color="#fff"
               active-text-color="#ffd04b"
+              default-active='$route.path.splice(1)'
               router
               unique-opened>
-              <el-submenu index="1">
+              <el-submenu :index='firstMenu.path' v-for='firstMenu in menuList' :key='firstMenu.id'>
+                <template slot="title">
+                  <i class="el-icon-location"></i>
+                  <span>{{ firstMenu.authName}}</span>
+                </template>
+                <el-menu-item :index="secondMenu.path" v-for='secondMenu in firstMenu.children' :key='secondMenu.id'>
+                  <i class="el-icon-menu"></i>
+                  <span>{{secondMenu.authName}}</span>
+                </el-menu-item>
+              </el-submenu>
+
+              <!-- <el-submenu index="1">
                 <template slot="title">
                   <i class="el-icon-location"></i>
                   <span>用户管理</span>
@@ -47,7 +55,7 @@
                   <i class="el-icon-menu"></i>
                   <span>角色列表</span>
                 </el-menu-item>
-                <el-menu-item index="2-2">
+                <el-menu-item index="/rights">
                   <i class="el-icon-menu"></i>
                   <span>权限列表</span>
                 </el-menu-item>
@@ -58,7 +66,7 @@
                   <i class="el-icon-location"></i>
                   <span>商品管理</span>
                 </template>
-                <el-menu-item index="3-1">
+                <el-menu-item index="/goods">
                   <i class="el-icon-menu"></i>
                   <span>商品列表</span>
                 </el-menu-item>
@@ -92,7 +100,7 @@
                   <i class="el-icon-menu"></i>
                   <span>数据报表</span>
                 </el-menu-item>
-              </el-submenu>
+              </el-submenu> -->
             </el-menu>
           </el-col>
         </el-row>
@@ -107,13 +115,13 @@
 
 <script>
 export default {
+  data() {
+    return {
+      menuList: []
+    }
+  },
   methods: {
-    handleOpen(key, keyPath) {
-      console.log(key, keyPath)
-    },
-    handleClose(key, keyPath) {
-      console.log(key, keyPath)
-    },
+    // 退出功能
     logout() {
       this.$confirm('您确定退出吗?', '提示', {
         confirmButtonText: '确定',
@@ -142,6 +150,16 @@ export default {
           })
         })
     }
+  },
+  created() {
+    // 左侧导航渲染
+    this.axios({
+      method: 'get',
+      url: 'menus'
+    }).then(res => {
+      // console.log(res)
+      this.menuList = res.data
+    })
   }
 }
 </script>
